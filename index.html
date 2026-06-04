@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>شركة الشحن العالمية</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      background: linear-gradient(135deg, #1a1a2e, #16213e);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .container {
+      background: white;
+      padding: 40px;
+      border-radius: 20px;
+      width: 100%;
+      max-width: 500px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+    h1 { text-align: center; color: #1a1a2e; margin-bottom: 30px; }
+    h1 span { color: #e94560; }
+    .form-group { margin-bottom: 20px; }
+    label { display: block; margin-bottom: 8px; color: #333; font-weight: 600; }
+    input, select, textarea {
+      width: 100%;
+      padding: 15px;
+      border: 2px solid #ddd;
+      border-radius: 10px;
+      font-size: 16px;
+      transition: 0.3s;
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color: #e94560;
+      outline: none;
+    }
+    .radio-group { display: flex; gap: 15px; }
+    .radio-option {
+      flex: 1;
+      padding: 15px;
+      border: 2px solid #ddd;
+      border-radius: 10px;
+      text-align: center;
+      cursor: pointer;
+    }
+    .radio-option.selected { border-color: #e94560; background: #ffeef2; }
+    button {
+      width: 100%;
+      padding: 18px;
+      background: linear-gradient(135deg, #e94560, #0f3460);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    button:hover { transform: translateY(-3px); }
+    
+    .tabs { display: flex; margin-bottom: 30px; }
+    .tab { flex: 1; padding: 15px; text-align: center; cursor: pointer; background: #f0f0f0; border-radius: 10px 10px 0 0; }
+    .tab.active { background: #e94560; color: white; }
+    
+    .form-section { display: none; }
+    .form-section.active { display: block; }
+    
+    .status-box { padding: 20px; border-radius: 15px; text-align: center; margin-top: 20px; }
+    .status-new { background: #fff3cd; }
+    .status-warehouse { background: #cce5ff; }
+    .status-shipped { background: #d4edda; }
+    .status-delivered { background: #28a745; color: white; }
+    
+    #appSections, #successMsg { display: none; }
+    .logout-btn { background: #dc3545; margin-top: 20px; }
+    .error-msg { color: red; text-align: center; display: none; margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🚚 شركة <span>الشحن</span> العالمية</h1>
+    
+    <!-- تسجيل الدخول -->
+    <div id="loginSection">
+      <div class="form-group">
+        <label>📧 الإيميل</label>
+        <input type="email" id="loginEmail" placeholder="أدخل الإيميل" required>
+      </div>
+      
+      <div class="form-group">
+        <label>🔑 الباسورد</label>
+        <input type="password" id="loginPassword" placeholder="أدخل الباسورد" required>
+      </div>
+      
+      <button id="loginBtn" onclick="login()">🔐 تسجيل دخول</button>
+      <p id="loginError" class="error-msg">❌ بيانات خاطئة</p>
+    </div>
+    
+    <!-- التطبيق -->
+    <div id="appSections">
+      <div class="tabs">
+        <div class="tab active" onclick="showTab('new')">📦 طلب جديد</div>
+        <div class="tab" onclick="showTab('track')">🔍 تتبع طلب</div>
+      </div>
+      
+      <!-- نموذج طلب جديد -->
+      <form id="orderForm" class="form-section active">
+        <div class="form-group">
+          <label>👤 اسم العميل</label>
+          <input type="text" name="clientName" required>
+        </div>
+        
+        <div class="form-group">
+          <label>📱 رقم الهاتف</label>
+          <input type="tel" name="phone" required>
+        </div>
+        
+        <div class="form-group">
+          <label>📍 العنوان</label>
+          <input type="text" name="address" required>
+        </div>
+        
+        <div class="form-group">
+          <label>📦 حجم الطرد</label>
+          <select name="weight" required>
+            <option value="">-- اختر الحجم --</option>
+            <option value="صغير">📦 صغير</option>
+            <option value="متوسط">📦 متوسط</option>
+            <option value="كبير">📦 كبير</option>
+            <option value="ثقيل">📦 ثقيل</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label>🔄 نوع الطلب</label>
+          <select name="type" required>
+            <option value="">-- اختر النوع --</option>
+            <option value="استبدال">🔁 استبدال</option>
+            <option value="استرجاع">↩️ استرجاع</option>
+            <option value="تسليم">📍 تسليم</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label>💰 مبلغ التحصيل</label>
+          <input type="number" name="collectionAmount" required>
+        </div>
+        
+        <div class="form-group">
+          <label>💵 التحصيل مع الشحن؟</label>
+          <div class="radio-group">
+            <label class="radio-option selected" onclick="selectRadio(this, 'نعم')">✅ نعم</label>
+            <label class="radio-option" onclick="selectRadio(this, 'لا')">❌ لا</label>
+          </div>
+          <input type="hidden" name="withShipping" id="withShipping" value="نعم">
+        </div>
+        
+        <div class="form-group">
+          <label>📝 ملاحظات</label>
+          <textarea name="notes" rows="3"></textarea>
+        </div>
+        
+        <button type="submit">🚀 إرسال الطلب</button>
+      </form>
+      
+      <!-- تتبع الطلب -->
+      <form id="trackForm" class="form-section">
+        <div class="form-group">
+          <label>📱 أدخل رقم الهاتف</label>
+          <input type="tel" id="searchPhone" required>
+        </div>
+        
+        <button type="submit">🔍 بحث</button>
+        
+        <div id="statusResult"></div>
+      </form>
+      
+      <button class="logout-btn" onclick="logout()">🚪 تسجيل خروج</button>
+    </div>
+    
+    <div id="successMsg">
+      <h2 style="color:#28a745">✅ تم إرسال طلبك بنجاح!</h2>
+      <p>رقم هاتفك: <strong id="savedPhone"></strong></p>
+      <button onclick="location.reload()" style="margin-top:20px">طلب جديد</button>
+    </div>
+  </div>
+
+  <script>
+    // ⬅️ الصق رابط الـ Web App هنا
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbycXyLcqd-yXeImo58bSZ8IzoAGsM-S1K1zRAYs9zLdvZg5vwFWE3O7rbsPDMU5eqYs/exec";
+
+    let selectedWithShipping = 'نعم';
+
+    // تسجيل الدخول
+    async function login() {
+      const email = document.getElementById('loginEmail').value;
+      const password = document.getElementById('loginPassword').value;
+      const btn = document.getElementById('loginBtn');
+      
+      if (!email || !password) {
+        alert('يرجى إدخال الإيميل والباسورد');
+        return;
+      }
+      
+      btn.textContent = '⏳ جاري التحقق...';
+      btn.disabled = true;
+      
+      try {
+        const url = SCRIPT_URL + '?action=login&email=' + encodeURIComponent(email) + '&password=' + encodeURIComponent(password);
+        const response = await fetch(url);
+        const result = await response.json();
+        
+        console.log('Login result:', result);
+        
+        if (result.result === 'success') {
+          localStorage.setItem('userEmail', email);
+          document.getElementById('loginSection').style.display = 'none';
+          document.getElementById('appSections').style.display = 'block';
+        } else {
+          document.getElementById('loginError').style.display = 'block';
+          btn.textContent = '🔐 تسجيل دخول';
+          btn.disabled = false;
+        }
+      } catch (error) {
+        console.error('Login error:', error);
+        alert('❌ حدث خطأ: ' + error.message);
+        btn.textContent = '🔐 تسجيل دخول';
+        btn.disabled = false;
+      }
+    }
+
+    function logout() {
+      localStorage.removeItem('userEmail');
+      location.reload();
+    }
+
+    window.onload = function() {
+      if (localStorage.getItem('userEmail')) {
+        document.getElementById('loginSection').style.display = 'none';
+        document.getElementById('appSections').style.display = 'block';
+      }
+    }
+
+    function showTab(tab) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.form-section').forEach(f => f.classList.remove('active'));
+      
+      if (tab === 'new') {
+        document.querySelectorAll('.tab')[0].classList.add('active');
+        document.getElementById('orderForm').classList.add('active');
+      } else {
+        document.querySelectorAll('.tab')[1].classList.add('active');
+        document.getElementById('trackForm').classList.add('active');
+      }
+    }
+
+    function selectRadio(el, value) {
+      document.querySelectorAll('.radio-option').forEach(r => r.classList.remove('selected'));
+      el.classList.add('selected');
+      selectedWithShipping = value;
+      document.getElementById('withShipping').value = value;
+    }
+
+    // إرسال طلب جديد
+    document.getElementById('orderForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const btn = e.target.querySelector('button');
+      btn.textContent = '⏳ جاري الإرسال...';
+      btn.disabled = true;
+      
+      const formData = new FormData(e.target);
+      formData.set('withShipping', selectedWithShipping);
+      
+      const data = Object.fromEntries(formData);
+      data.timestamp = new Date().toISOString();
+
+      try {
+        const response = await fetch(SCRIPT_URL, {
+          method: 'POST',
+          body: JSON.stringify(data)
+        });
+        
+        document.getElementById('savedPhone').textContent = data.phone;
+        
+        document.getElementById('orderForm').style.display = 'none';
+        document.querySelector('.tabs').style.display = 'none';
+        document.getElementById('successMsg').style.display = 'block';
+      } catch (error) {
+        alert('❌ حدث خطأ');
+        btn.textContent = '🚀 إرسال الطلب';
+        btn.disabled = false;
+      }
+    });
+
+    // تتبع الطلب
+    document.getElementById('trackForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const phone = document.getElementById('searchPhone').value;
+      const btn = e.target.querySelector('button');
+      btn.textContent = '⏳ جاري البحث...';
+      
+      try {
+        const response = await fetch(SCRIPT_URL + '?action=track&phone=' + phone);
+        const result = await response.json();
+        
+        const resultDiv = document.getElementById('statusResult');
+        
+        if (result && result.status) {
+          let statusClass = 'status-new';
+          if (result.status === 'في المخزن') statusClass = 'status-warehouse';
+          else if (result.status === 'تم الشحن') statusClass = 'status-shipped';
+          else if (result.status === 'تم التسليم') statusClass = 'status-delivered';
+          
+          resultDiv.innerHTML = `
+            <div class="status-box ${statusClass}">
+              <h3>${result.clientName}</h3>
+              <h2>📦 ${result.status}</h2>
+              <p>💰 المبلغ: ${result.collectionAmount} ريال</p>
+              <p>${result.withShipping === 'نعم' ? '✅ التحصيل مع الشحن' : '❌ بدون'}</p>
+            </div>
+          `;
+        } else {
+          resultDiv.innerHTML = '<p style="color:red;text-align:center">❌ لم يتم العثور على طلب</p>';
+        }
+      } catch (error) {
+        alert('❌ حدث خطأ');
+      }
+      
+      btn.textContent = '🔍 بحث';
+    });
+  </script>
+</body>
+</html>
